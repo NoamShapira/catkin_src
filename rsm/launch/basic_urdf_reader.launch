@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+<arg name="model" default="$(find rsm)/urdf/colorado.urdf"/>
+<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+<node pkg="robot_state_publisher" type="robot_state_publisher" name="rob_st_pub" >
+    <!--remap from="robot_description" to="$(find rsm)/urdf/colorado.urdf" /-->
+    <!--remap from="joint_states" to="different_joint_states" /-->
+</node>
+</launch>
