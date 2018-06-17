@@ -1,0 +1,5 @@
+float32 radius 
+sensor_msgs/NavSatFix location
+nav_msgs/Odometry odom
+---
+sensor_msgs/NavSatFix[] relevant_waypoints

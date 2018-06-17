@@ -2,5 +2,13 @@
     "python.autoComplete.extraPaths": [
         "/home/rlb10/catkin_ws/devel/lib/python2.7/dist-packages",
         "/opt/ros/melodic/lib/python2.7/dist-packages"
-    ]
+    ],
+    "files.associations": {
+        "iostream": "cpp",
+        "*.ipp": "cpp",
+        "deque": "cpp",
+        "vector": "cpp",
+        "array": "cpp",
+        "list": "cpp"
+    }
 }
