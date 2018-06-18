@@ -7,6 +7,7 @@
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <math.h> 
 #include "ros/ros.h"
 #include <sensor_msgs/NavSatFix.h>
 
@@ -30,8 +31,8 @@ namespace csv_map_publisher
     class Point2D
     {
     public:
-        float lon_, lat_;
-        Point2D(float lon, float lat)
+        double lon_, lat_;
+        Point2D(double lon, double lat)
         {
             lon_ = lon;
             lat_ = lat;
@@ -40,6 +41,11 @@ namespace csv_map_publisher
         {
             lon_ = 0;
             lat_ = 0;
+        }
+        double distance_from_point(Point2D target)
+        {
+            double dist = sqrt((lon_-target.lon_)*(lon_-target.lon_) + 
+                                (lat_-target.lat_)*(lat_-target.lat_));
         }
     };
 
@@ -51,13 +57,13 @@ namespace csv_map_publisher
     public:
         CsvWaypointsMap(string csv_map_path)
         {
-
-            CSVReader csv_reader(csv_map_path); //TODO find out when i need to delete/free pointer?
+            CSVReader csv_reader(csv_map_path); 
             vector<vector<string>> string_data = csv_reader.getData();
             vector<vector<string>>::iterator it= string_data.begin();
             //start from the second row, asumes all rows exept first are only numbers
             bool lon_before_lat;
-            if (string_data.front().front() == "lat") {
+            if ((string_data.front().front() == "lon") ||
+                (string_data.front().front() == "longitude")) {
                 lon_before_lat = true;
             }
             else {
@@ -79,9 +85,20 @@ namespace csv_map_publisher
                 ++it;
             } 
         }
-        vector<Point2D> get_points_in_radius(Point2D location, float radius)
+
+        vector<Point2D> get_points_in_radius(Point2D location, double radius)
         {
-            // TODO
+            vector<Point2D> close_points;
+            for(vector<Point2D>::iterator it=waypoints_map_.begin();
+                 it != waypoints_map_.end(); ++it)
+            {
+                if(it->distance_from_point(location) < radius)
+                {
+                    //TODO ask dori tomorow if waypoints_map_ may be changed from the return value
+                    close_points.push_back(*it);
+                }
+            }
+            return close_points;
         }
     };
 

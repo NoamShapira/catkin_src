@@ -1,4 +1,4 @@
-float32 radius 
+float64 radius 
 sensor_msgs/NavSatFix location
 ---
 sensor_msgs/NavSatFix[] relevant_waypoints
