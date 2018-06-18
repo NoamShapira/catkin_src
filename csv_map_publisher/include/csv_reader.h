@@ -2,6 +2,9 @@
 #define CSV_READER
 
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <exception> 
 #include <vector>
 #include <iterator>
 #include <string>
@@ -31,20 +34,33 @@ public:
 */
 std::vector<std::vector<std::string> > CSVReader::getData()
 {
-	std::ifstream file(fileName);
- 
+	std::ifstream f_stream;
+	f_stream.exceptions(std::ifstream::failbit);
+	try 
+	{
+		f_stream.open(fileName);
+	}
+	catch (const std::exception& e) 
+	{
+		std::stringstream msg;
+    	msg << "Opening file '" << fileName 
+			<< "' failed, it either doesn't exist or is not accessible.";
+    	throw std::runtime_error(msg.str());
+	}
+	
+
 	std::vector<std::vector<std::string> > dataList;
  
 	std::string line = "";
 	// Iterate through each line and split the content using delimeter
-	while (getline(file, line))
+	while (getline(f_stream, line))
 	{
 		std::vector<std::string> vec;
 		boost::algorithm::split(vec, line, boost::is_any_of(delimeter));
 		dataList.push_back(vec);
 	}
 	// Close the File
-	file.close();
+	f_stream.close();
  
 	return dataList;
 }

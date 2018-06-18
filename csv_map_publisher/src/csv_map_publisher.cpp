@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <exception> 
 
 #include <string>
 #include <vector>
@@ -51,11 +52,10 @@ namespace csv_map_publisher
         CsvWaypointsMap(string csv_map_path)
         {
 
-            CSVReader csv_reader(csv_map_path);
+            CSVReader csv_reader(csv_map_path); //TODO find out when i need to delete/free pointer?
             vector<vector<string>> string_data = csv_reader.getData();
             vector<vector<string>>::iterator it= string_data.begin();
             //start from the second row, asumes all rows exept first are only numbers
-            //check if lon_before_lat
             bool lon_before_lat;
             if (string_data.front().front() == "lat") {
                 lon_before_lat = true;
@@ -63,7 +63,7 @@ namespace csv_map_publisher
             else {
                 lon_before_lat = false;
             }
-            ++it;
+            ++it; //start parse numbers from second row
 
             while (it!=string_data.end()) {
                 Point2D cur_point;
@@ -93,6 +93,7 @@ namespace csv_map_publisher
         for (vector<Point2D>::iterator it = rel_points.begin(); it!=rel_points.end(); ++it)
         {
             sensor_msgs::NavSatFix cur_navsatfix;
+
             cur_navsatfix.header = req.location.header;
             cur_navsatfix.status = req.location.status;
             cur_navsatfix.longitude = it->lon_;
@@ -108,9 +109,26 @@ namespace csv_map_publisher
 
     int main(int argc, char **argv)
     {
-        CsvWaypointsMap waypoints_maps(string("a ")); // TODO add ros param
+        string csv_map_path;
         ros::init(argc, argv, "map_publlisher");
         ros::NodeHandle n;
+        if (n.hasParam("csv_map_path")) 
+        {
+            n.getParam("csv_map_path", csv_map_path);
+            ROS_INFO("Got param: csv_map_path");
+        }
+        else {ROS_ERROR("param csv_map_path not found");}
+
+        try 
+        { 
+            CsvWaypointsMap waypoints_maps(csv_map_path);
+        }
+        catch (exception& e)
+        {
+            ROS_ERROR(e.what());
+        }
+        
+
         boost::function<bool(RadRequest, RadResponse)> b_f =
                      boost::bind(get_radius_waypoints, _1, _2, waypoints_maps); 
         ros::ServiceServer service = 
