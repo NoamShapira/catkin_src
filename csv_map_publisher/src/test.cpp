@@ -11,23 +11,26 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    string path = "//home/rlb10/catkin_ws/src/csv_map_publisher/csv/Arsuf_Driving_Path.csv";
+    // csv reader tests
+    string good_path = "//home/rlb10/catkin_ws/src/csv_map_publisher/csv/Arsuf_Driving_Path.csv";
+    string bad_path = "//home/bad_path.csv";
     
     try
     {
-        CSVReader csv_reader(path);
+        CSVReader csv_reader(good_path);
         cout << "created a reader" << endl;
         vector<vector<string>> csv_data = csv_reader.getData();
         cout << "loaded the data" << endl;
-        cout << "the (0,0) elem is: " << csv_data.front().front() << endl; 
+        cout << "first row is: (" << csv_data.front().front() << "," 
+            << csv_data.front().back()<< ")" << endl; 
+        cout << "number of rows on csv file is: " << csv_data.size() << endl;
+        cout << "number of cols in first csv row is: " << csv_data.front().size() << endl;
     
     }
     catch(const exception& e)
     {
-        cout << "exception was thrown" << endl;
-        cout << e.what() << endl;
-        cout << typeid(e).name() <<endl;
-        // cerr << e.what() << endl;
+        cout << "exception was thrown\ne.what: " << e.what() << endl;
+        cout << "typeid(e): " << typeid(e).name() <<endl;
     }
 
     cout << " ---------- " << endl << "test ended" << endl;

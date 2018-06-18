@@ -122,19 +122,17 @@ namespace csv_map_publisher
         try 
         { 
             CsvWaypointsMap waypoints_maps(csv_map_path);
+            boost::function<bool(RadRequest, RadResponse)> b_f =
+                     boost::bind(get_radius_waypoints, _1, _2, waypoints_maps); 
+            ros::ServiceServer service = 
+            n.advertiseService<RadRequest,RadResponse>("get_waypoints_in_radius",b_f);
+            ros::spin();
         }
-        catch (exception& e)
+        catch (std::exception& e)
         {
             ROS_ERROR(e.what());
         }
-        
-
-        boost::function<bool(RadRequest, RadResponse)> b_f =
-                     boost::bind(get_radius_waypoints, _1, _2, waypoints_maps); 
-        ros::ServiceServer service = 
-            n.advertiseService<RadRequest,RadResponse>("get_waypoints_in_radius",b_f);
-        ros::spin();
-
+      
         return 0;
     };
 }; // namespace csv_map_publisher
