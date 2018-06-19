@@ -5,8 +5,8 @@
 #include <exception>
 
 #include "../include/csv_reader.h"
+#include "../include/csv_waypoints_map.h"
 
-//test csv_reader
 using namespace std;
 
 int main(int argc, char const *argv[])
@@ -17,15 +17,21 @@ int main(int argc, char const *argv[])
     
     try
     {
+        cout << "\n---testing CSVReader---\n"<< endl;
         CSVReader csv_reader(good_path);
         cout << "created a reader" << endl;
         vector<vector<string>> csv_data = csv_reader.getData();
         cout << "loaded the data" << endl;
         cout << "first row is: (" << csv_data.front().front() << "," 
-            << csv_data.front().back()<< ")" << endl; 
+            << csv_data.front().back()<< ")" << endl;
+        cout << "last row is: (" << csv_data.back().front() << "," 
+            << csv_data.back().back()<< ")" << endl; 
         cout << "number of rows on csv file is: " << csv_data.size() << endl;
         cout << "number of cols in first csv row is: " << csv_data.front().size() << endl;
-    
+
+        cout << "\n---testing get_points_in_radius---\n"<< endl;
+        // CsvWaypointsMap waypoints_maps(good_path);
+        
     }
     catch(const exception& e)
     {
