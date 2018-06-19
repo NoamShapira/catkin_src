@@ -4,14 +4,17 @@
 #include <typeinfo>
 #include <exception>
 
+#include <type_traits>
+
 #include "../include/csv_reader.h"
 #include "../include/csv_waypoints_map.h"
+#include "../include/sphere_point2d.h"
 
 using namespace std;
+using namespace csv_map_publisher;
 
 int main(int argc, char const *argv[])
 {
-    // csv reader tests
     string good_path = "//home/rlb10/catkin_ws/src/csv_map_publisher/csv/Arsuf_Driving_Path.csv";
     string bad_path = "//home/bad_path.csv";
     
@@ -30,10 +33,13 @@ int main(int argc, char const *argv[])
         cout << "number of cols in first csv row is: " << csv_data.front().size() << endl;
 
         cout << "\n---testing get_points_in_radius---\n"<< endl;
-        // CsvWaypointsMap waypoints_maps(good_path);
+        CsvWaypointsMap waypoints_map(good_path);
+        // vector<SpherePoint2D> relevant_points;
+        SpherePoint2D p(1.0,0);
+        SpherePoint2D p();
         
     }
-    catch(const exception& e)
+    catch(const std::exception& e)
     {
         cout << "exception was thrown\ne.what: " << e.what() << endl;
         cout << "typeid(e): " << typeid(e).name() <<endl;

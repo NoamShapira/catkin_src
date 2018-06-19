@@ -1,36 +1,46 @@
-#ifndef POINT_TWO_D
-#define POINT_TWO_D
+#ifndef POINT2D
+#define POINT2D
 
-#include <math.h>
+#include <boost/shared_ptr.hpp>
+
+using namespace boost;
 
 class Point2D
-    {
-    private:
-        double lon_, lat_;
+{
+private:
+    double x_, y_;
+public:
+    Point2D(double x, double y);
+    Point2D::Point2D();
+    ~Point2D();
+    double get_x();
+    double get_y();
+    void set_x(double x);
+    void set_y(double y);
 
-    public:
-        
-        Point2D(double lon, double lat)
-        {
-            lon_ = lon;
-            lat_ = lat;
-        };
-        Point2D()
-        {
-            lon_ = 0;
-            lat_ = 0;
-        }
-        double distance_from_point(Point2D target)
-        {
-            double dist = sqrt((lon_-target.lon_)*(lon_-target.lon_) + 
-                                (lat_-target.lat_)*(lat_-target.lat_));
-        }
+    virtual double distance_to(boost::shared_ptr<Point2D> point_ptr)=0;
+};
 
-        double get_lon() {return lon_;}
-        double get_lat() {return lat_;}
 
-        void set_lon(double lon) {lon_ = lon;}
-        void set_lat(double lat) {lat_ = lat;}
-    };
+Point2D::Point2D(double x, double y)
+{
+    x_ = x;
+    y_ = y;
+}
+Point2D::Point2D()
+{
+    x_ = 0;
+    y_ = 0;
+}
+
+Point2D::~Point2D()
+{
+}
+
+double Point2D::get_x() {return x_;}
+double Point2D::get_y() {return y_;}
+void Point2D::set_x(double x) {x_ = x;}
+void Point2D::set_y(double y) {y_ = y;}
+
 
 #endif
