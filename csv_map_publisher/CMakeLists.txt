@@ -123,10 +123,14 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(
-#   ${PROJECT_NAME}/include/csv_reader.h
-#   ${catkin_INCLUDE_DIRS}
-# )
+include_directories(
+  ${PROJECT_NAME}/include/csv_reader.h
+  ${PROJECT_NAME}/include/csv_waypoints_map.h
+  ${PROJECT_NAME}/include/point2d.h
+  ${PROJECT_NAME}/include/sphere_point2d.h
+  ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
+)
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}

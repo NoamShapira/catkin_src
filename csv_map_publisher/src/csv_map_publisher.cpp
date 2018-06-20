@@ -7,7 +7,6 @@
 #include <vector>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-// #include <math.h> 
 #include <ros/ros.h>
 #include <sensor_msgs/NavSatFix.h>
 
