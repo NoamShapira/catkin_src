@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
     
     try
     {
+        cout.precision(16);
         cout << "\n---testing CSVReader---\n"<< endl;
         CSVReader csv_reader(good_path);
         cout << "created a reader" << endl;
@@ -32,20 +33,35 @@ int main(int argc, char const *argv[])
         cout << "number of rows on csv file is: " << csv_data.size() << endl;
         cout << "number of cols in first csv row is: " << csv_data.front().size() << endl;
 
+       
         cout << "\n---testing get_points_in_radius---\n"<< endl;
         CsvWaypointsMap waypoints_map(good_path);
-        // vector<SpherePoint2D> relevant_points;
-        SpherePoint2D p(1.0,0);
-        SpherePoint2D p();
+        boost::shared_ptr<SpherePoint2D> p1_ptr(new SpherePoint2D(32.1961762516997,34.8128624281800));
+        p1_ptr->print();
+        boost::shared_ptr<SpherePoint2D> p2_ptr(new SpherePoint2D());
+        p2_ptr->print();
+        vector<SpherePoint2D> rel_points;
+        rel_points = waypoints_map.get_points_in_radius(p1_ptr, 10);
+        cout << "number of relevant points is: " << rel_points.size() << endl;
+        if (rel_points.size() < 10) {
+            
+            for(vector<SpherePoint2D>::iterator it = rel_points.begin();
+                         it != rel_points.end(); it++)
+            {
+                cout << "\t";
+                it->print(); 
+            }
+            
+        }
         
     }
     catch(const std::exception& e)
     {
-        cout << "exception was thrown\ne.what: " << e.what() << endl;
+        cout << "\n\nexception was thrown\ne.what: " << e.what() << endl;
         cout << "typeid(e): " << typeid(e).name() <<endl;
     }
 
-    cout << " ---------- " << endl << "test ended" << endl;
+    cout << "\n----test ended----" << endl;
     return 0;
 }
 

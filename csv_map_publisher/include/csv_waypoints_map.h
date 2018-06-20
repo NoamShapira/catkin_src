@@ -44,12 +44,12 @@ namespace csv_map_publisher
         while (it!=string_data.end()) {
             SpherePoint2D cur_point;
             if(lon_before_lat){
-                cur_point.set_lon(stof(it->front()));
-                cur_point.set_lat(stof(it->back()));
+                cur_point.set_lon(stod(it->front()));
+                cur_point.set_lat(stod(it->back()));
             }
             else {
-                cur_point.set_lat(stof(it->front()));
-                cur_point.set_lon(stof(it->back()));
+                cur_point.set_lat(stod(it->front()));
+                cur_point.set_lon(stod(it->back()));
             }
             waypoints_map_.push_back(cur_point);
             ++it;
@@ -59,12 +59,12 @@ namespace csv_map_publisher
     vector<SpherePoint2D> CsvWaypointsMap::get_points_in_radius(boost::shared_ptr<SpherePoint2D> location, double radius)
     {
         vector<SpherePoint2D> close_points;
-        for(vector<SpherePoint2D>::iterator it=waypoints_map_.begin();
+        for(vector<SpherePoint2D>::iterator it = waypoints_map_.begin();
                 it != waypoints_map_.end(); ++it)
         {
-            if(it->distance_to(location) < radius)
+            if(it->distance_to(location) <= radius)
             {
-                close_points.push_back(it.base);
+                close_points.push_back(*it);
             }
         }
         return close_points;

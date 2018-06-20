@@ -12,20 +12,21 @@ using namespace std;
 using namespace boost;
 
 
-class SpherePoint2D : Point2D
+class SpherePoint2D : public Point2D
     {
     private:
         bool in_deg_;
         const double R_EARTH_ISRAEL = 6371207;
-        const double ANGLE_TO_RAD = M_PI/180;
+        const double DEG_TO_RAD = M_PI/180;
 
     public:
-        SpherePoint2D(double lon, double lat, bool in_deg = true);
+        SpherePoint2D(double lon, double lat, bool in_deg);
+        SpherePoint2D(double lon, double lat);
         SpherePoint2D();
         ~SpherePoint2D();
 
         double distance_to(boost::shared_ptr<Point2D> point_ptr);
-        double haversine_distance_to(SpherePoint2D * point_ptr);
+        double haversine_distance_to(boost::shared_ptr<SpherePoint2D> point_ptr);
 
         double get_lon() {return get_x();}
         double get_lat() {return get_y();}
@@ -34,24 +35,25 @@ class SpherePoint2D : Point2D
         void set_lat(double lat) {set_y(lat);}
     };
 
+SpherePoint2D::SpherePoint2D(double lon, double lat)
+    : Point2D(lon,lat), in_deg_(true)
+{}
 
-SpherePoint2D::SpherePoint2D(double lon, double lat, bool in_deg = true) 
-: Point2D(lon,lat)
-{
-    in_deg = in_deg_;
-}
+SpherePoint2D::SpherePoint2D(double lon, double lat, bool in_deg) 
+    : Point2D(lon,lat), in_deg_(in_deg)
+{}
 
-SpherePoint2D::SpherePoint2D():Point2D()
-{
-    in_deg_ = true;
-}
+SpherePoint2D::SpherePoint2D()
+    : Point2D(), in_deg_(true)
+{}
 
-SpherePoint2D::~SpherePoint2D() {}
+SpherePoint2D::~SpherePoint2D() 
+{}
 
 double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
 {
-    boost::shared_ptr<SpherePoint2D> sphere_point_ptr = 
-        boost::dynamic_pointer_cast<SpherePoint2D>(point_ptr);
+    boost::shared_ptr<SpherePoint2D> sphere_point_ptr;
+    sphere_point_ptr = boost::dynamic_pointer_cast<SpherePoint2D>(point_ptr);
     if (!sphere_point_ptr)
     {
 
@@ -65,8 +67,8 @@ double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
     double lam1, lam2, phi1, phi2;
     if(in_deg_)
     {
-        lam1 = get_x() * ANGLE_TO_RAD;
-        phi1 = get_y() * ANGLE_TO_RAD;
+        lam1 = get_x() * DEG_TO_RAD;
+        phi1 = get_y() * DEG_TO_RAD;
     }
     else
     {
@@ -75,8 +77,8 @@ double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
     }
     if (sphere_point_ptr->in_deg_) 
     {
-        lam2 = sphere_point_ptr->get_x() *ANGLE_TO_RAD;
-        phi2 = sphere_point_ptr->get_y() *ANGLE_TO_RAD;
+        lam2 = sphere_point_ptr->get_x() *DEG_TO_RAD;
+        phi2 = sphere_point_ptr->get_y() *DEG_TO_RAD;
     }
     else
     {
@@ -89,13 +91,13 @@ double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
     double dist = sqrt(d_phi*d_phi + d_lamda*d_lamda) * R_EARTH_ISRAEL;
 }
 
-double SpherePoint2D::haversine_distance_to(SpherePoint2D * point_ptr)
+double SpherePoint2D::haversine_distance_to(boost::shared_ptr<SpherePoint2D>  point_ptr)
 {      
     double lam1, lam2, phi1, phi2;
     if(in_deg_)
     {
-        lam1 = get_x() * ANGLE_TO_RAD;
-        phi1 = get_y() * ANGLE_TO_RAD;
+        lam1 = get_x() * DEG_TO_RAD;
+        phi1 = get_y() * DEG_TO_RAD;
     }
     else
     {
@@ -104,8 +106,8 @@ double SpherePoint2D::haversine_distance_to(SpherePoint2D * point_ptr)
     }
     if (point_ptr->in_deg_) 
     {
-        lam2 = point_ptr->get_x() *ANGLE_TO_RAD;
-        phi2 = point_ptr->get_y() *ANGLE_TO_RAD;
+        lam2 = point_ptr->get_x() *DEG_TO_RAD;
+        phi2 = point_ptr->get_y() *DEG_TO_RAD;
     }
     else
     {
