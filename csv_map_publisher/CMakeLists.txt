@@ -9,11 +9,13 @@ project(csv_map_publisher)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
+  genmsg
   message_runtime
   nav_msgs
   roscpp
   sensor_msgs
   std_msgs
+  roslaunch
 #  geomerty_msgs
 )
 
@@ -124,17 +126,16 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  ${PROJECT_NAME}/include/csv_reader.h
-  ${PROJECT_NAME}/include/csv_waypoints_map.h
-  ${PROJECT_NAME}/include/point2d.h
-  ${PROJECT_NAME}/include/sphere_point2d.h
+  ${PROJECT_NAME}/include
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
+#   include
 #   src/csv_reader.cpp
+#   src/
 # )
 
 ## Add cmake target dependencies of the library
@@ -145,7 +146,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/csv_map_publisher.cpp)
+add_executable(csv_map_publisher_node src/csv_map_publisher.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,10 +156,10 @@ add_executable(${PROJECT_NAME}_node src/csv_map_publisher.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(csv_map_publisher_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(csv_map_publisher_node
   ${catkin_LIBRARIES}
 )
 
@@ -191,11 +192,11 @@ target_link_libraries(${PROJECT_NAME}_node
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  launch/harsuf.launch
+  # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

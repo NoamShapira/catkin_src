@@ -23,8 +23,11 @@ namespace csv_map_publisher
 
         vector<SpherePoint2D> get_points_in_radius(boost::shared_ptr<SpherePoint2D> location, double radius);  
     };
+} //csv_map_publisher
 
 
+namespace csv_map_publisher
+{
     CsvWaypointsMap::CsvWaypointsMap(string csv_map_path)
     {
         CSVReader csv_reader(csv_map_path); 

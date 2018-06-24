@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="csv_map_publisher" type="csv_map_publisher_node" name="csv_map_publisher_node">
+        <param name="csv_map_path" 
+            value="$(find csv_map_publisher)/csv/Arsuf_Driving_Path.csv">
+        </param>
+    </node>
+
+</launch>

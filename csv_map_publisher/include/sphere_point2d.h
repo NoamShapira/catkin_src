@@ -4,6 +4,7 @@
 #include <math.h>
 #include <exception>
 #include <string>
+#include <sstream>
 #include <boost/shared_ptr.hpp>
 
 #include "../include/point2d.h"
