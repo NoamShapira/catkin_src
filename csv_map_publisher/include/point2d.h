@@ -6,41 +6,70 @@
 
 using namespace std;
 
+/*
+ * @brief A interface for 2 dimentional points 
+ *  contain simple getters and setters and a virtual distance_to mathod
+ */
 class Point2D
 {
 private:
+    //The 2 values of the 2d point
     long double x_, y_;
 public:
+    /*
+     * @brief A full constructor
+     * @param x first cordinate value
+     * @param y second cordinate value
+     */
     Point2D(double x, double y);
-    Point2D();
-    ~Point2D();
-    double get_x();
-    double get_y();
-    void set_x(double x);
-    void set_y(double y);
-    void print();
 
+    /*
+     * @brief empty constructor (x,y) = (0,0)
+     */
+    Point2D();
+
+    /*
+     * @brief distructor
+     */
+    ~Point2D();
+
+    /*
+     * @brief getter for the first cordinate
+     * @return first cordinate value
+     */
+    double get_x();
+
+    /*
+     * @brief getter for the second cordinate
+     * @return second cordinate value
+     */
+    double get_y();
+
+    /*
+     * @brief setter for first cordinate
+     * @param x the valuu for first cordinate
+     */
+    void set_x(double x);
+    
+    /*
+     * @brief setter for second cordinate
+     * @param x the valuu for second cordinate
+     */
+    void set_y(double y);
+
+    /*
+     * @brief a simple method that prints the points values to the standart output
+     *  this is a virtual but not pure virtual method
+     */
+    virtual void print();
+
+    /*
+     * @brief this interface only pure vertual method,
+     *  this method is virtual because distance is calulated difrent for difrent types of points
+     * @param point_ptr a pointer to another point
+     * @return the distance to the other point in meters
+     */
     virtual double distance_to(boost::shared_ptr<Point2D> point_ptr)=0;
 };
-
-
-Point2D::Point2D(double x, double y): x_(x), y_(y)
-{}
-Point2D::Point2D(): x_(0), y_(0)
-{}
-
-Point2D::~Point2D()
-{}
-
-void Point2D::print() 
-{
-    cout.precision(16);
-    cout << "(" << x_ << ", " << y_ << ")\n";
-}
-double Point2D::get_x() {return x_;}
-double Point2D::get_y() {return y_;}
-void Point2D::set_x(double x) {x_ = x;}
-void Point2D::set_y(double y) {y_ = y;}
-
 
 #endif

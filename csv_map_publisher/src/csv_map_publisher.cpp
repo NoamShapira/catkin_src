@@ -1,6 +1,5 @@
 
-// #include <iostream>
-// #include <fstream>
+
 #include <exception> 
 #include <string>
 #include <vector>
@@ -25,15 +24,19 @@ using namespace ros;
 typedef GetWaypointsInRadius::Response RadResponse;
 typedef GetWaypointsInRadius::Request RadRequest;
 
+/*
+ * A callback method for a ROS serrvice
+ */
 bool get_radius_waypoints(RadRequest &req, RadResponse &res, CsvWaypointsMap map)
 {
     boost::shared_ptr<SpherePoint2D> 
         location_ptr(new SpherePoint2D(req.location.longitude, req.location.latitude));
+    // Get the relevant points from the map
     vector<SpherePoint2D> rel_points = map.get_points_in_radius(location_ptr, req.radius);
+    // Convert the relevant points from map to ros nav_sat_fix
     for (vector<SpherePoint2D>::iterator it = rel_points.begin(); it!=rel_points.end(); ++it)
     {
         sensor_msgs::NavSatFix cur_navsatfix;
-
         cur_navsatfix.header = req.location.header;
         cur_navsatfix.status = req.location.status;
         cur_navsatfix.longitude = it->get_lon();
@@ -47,11 +50,13 @@ bool get_radius_waypoints(RadRequest &req, RadResponse &res, CsvWaypointsMap map
     return true;
 };
 
+
 int main(int argc, char **argv)
 {
     string csv_map_path;
     ros::init(argc, argv, "map_publlisher");
     ros::NodeHandle n;
+    //look for the csv file path
     //TODO the parameter name search is not general solution
     if (n.hasParam("csv_map_publisher_node/csv_map_path")) 
     {

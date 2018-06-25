@@ -12,118 +12,87 @@
 using namespace std;
 using namespace boost;
 
-
+/*
+ * @brief A class that represent a 2 dimentional point on a shpere (lon, lat)
+ */
 class SpherePoint2D : public Point2D
     {
     private:
+        //This is a boolean that matks wither the value is metured in degrees (or radians)
         bool in_deg_;
+        //A constant for distance calculations
         const double R_EARTH_ISRAEL = 6371207;
+        //A constant for convertions between difrent angle units
         const double DEG_TO_RAD = M_PI/180;
 
     public:
+        /*
+         * @brief A full constructor
+         * @param lon represents longtitude
+         * @param lat represents latitude
+         * @param in_deg represents whether the the values are metured in degrees
+         */
         SpherePoint2D(double lon, double lat, bool in_deg);
+
+        /*
+         * @brief A constructor that asumes the values are in degrees 
+         *  like SpherePoint2D(lon,lat,true)
+         * @param lon represents longtitude
+         * @param lat represents latitude
+         */
         SpherePoint2D(double lon, double lat);
+
+        /*
+         * @brief A empty constructor like SpherePoint2D(0,0,true)
+         */
         SpherePoint2D();
+
+        /*
+         * @brief A destructor
+         */
         ~SpherePoint2D();
 
+        /*
+         * @brief the implementation for virtual method in point, calculate the
+         *  distance in meters to a given point. if the point is not SpherePoint2D
+         *  an exception will be thrown
+         * @param point_ptr A pointer to the destenation point
+         * @return Thr distance in meters
+         */
         double distance_to(boost::shared_ptr<Point2D> point_ptr);
+
+        /* 
+         * @brief the real calculation of distance between two point on the serface
+         *  of a sphere
+         * @param point_ptr A pointer to the destenation point
+         * @return Thr distance in meters  
+         */
         double haversine_distance_to(boost::shared_ptr<SpherePoint2D> point_ptr);
 
+        /*
+         * @brief A wraper for get_x() for convinience 
+         * @return the longtitude (or x) value
+         */
         double get_lon() {return get_x();}
+
+        /*
+         * @brief A wraper for get_y() for convinience 
+         * @return the latitude (or y) value
+         */
         double get_lat() {return get_y();}
 
+        /*
+         * @brief A wraper for set_x() for convinience 
+         * @param lon  longtitude (or x) value
+         */
         void set_lon(double lon) {set_x(lon);}
+
+        /*
+         * @brief A wraper for set_y() for convinience 
+         * @return latitude (or y) value
+         */
         void set_lat(double lat) {set_y(lat);}
     };
-
-SpherePoint2D::SpherePoint2D(double lon, double lat)
-    : Point2D(lon,lat), in_deg_(true)
-{}
-
-SpherePoint2D::SpherePoint2D(double lon, double lat, bool in_deg) 
-    : Point2D(lon,lat), in_deg_(in_deg)
-{}
-
-SpherePoint2D::SpherePoint2D()
-    : Point2D(), in_deg_(true)
-{}
-
-SpherePoint2D::~SpherePoint2D() 
-{}
-
-double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
-{
-    boost::shared_ptr<SpherePoint2D> sphere_point_ptr;
-    sphere_point_ptr = boost::dynamic_pointer_cast<SpherePoint2D>(point_ptr);
-    if (!sphere_point_ptr)
-    {
-
-        stringstream err_msg; 
-        err_msg << "distace can be calclated only between"<<
-            "same type of points\n tried to clculate distance" << 
-            "from sphere point to non shpere point";
-        throw (runtime_error(err_msg.str()));
-    }
-
-    double lam1, lam2, phi1, phi2;
-    if(in_deg_)
-    {
-        lam1 = get_x() * DEG_TO_RAD;
-        phi1 = get_y() * DEG_TO_RAD;
-    }
-    else
-    {
-        lam1 = get_x();
-        phi1 = get_y();
-    }
-    if (sphere_point_ptr->in_deg_) 
-    {
-        lam2 = sphere_point_ptr->get_x() *DEG_TO_RAD;
-        phi2 = sphere_point_ptr->get_y() *DEG_TO_RAD;
-    }
-    else
-    {
-        lam2 = sphere_point_ptr->get_x();
-        phi2 = sphere_point_ptr->get_y();
-    }
-    
-    double d_lamda = lam2- lam1;
-    double d_phi = phi2 - phi1;
-    double dist = sqrt(d_phi*d_phi + d_lamda*d_lamda) * R_EARTH_ISRAEL;
-}
-
-double SpherePoint2D::haversine_distance_to(boost::shared_ptr<SpherePoint2D>  point_ptr)
-{      
-    double lam1, lam2, phi1, phi2;
-    if(in_deg_)
-    {
-        lam1 = get_x() * DEG_TO_RAD;
-        phi1 = get_y() * DEG_TO_RAD;
-    }
-    else
-    {
-        lam1 = get_x();
-        phi1 = get_y();
-    }
-    if (point_ptr->in_deg_) 
-    {
-        lam2 = point_ptr->get_x() *DEG_TO_RAD;
-        phi2 = point_ptr->get_y() *DEG_TO_RAD;
-    }
-    else
-    {
-        lam2 = point_ptr->get_x();
-        phi2 = point_ptr->get_y();
-    }
-    
-    double d_lamda = lam2- lam1;
-    double d_phi = phi2 - phi1;
-
-    double a = sin(d_phi/2)*sin(d_phi/2) +
-                (cos(phi1)*cos(phi2) * sin(d_lamda/2)*sin(d_lamda/2));
-    double c = 2 * atan2(sqrt(a), sqrt(1-a));
-    return (R_EARTH_ISRAEL * c);
-}
 
 
 #endif

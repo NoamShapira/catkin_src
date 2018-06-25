@@ -9,15 +9,14 @@ project(csv_map_publisher)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
-  genmsg
   message_runtime
   nav_msgs
   roscpp
   sensor_msgs
-  std_msgs
   roslaunch
-#  geomerty_msgs
 )
+# # This driver uses Boost threads
+# find_package(Boost REQUIRED COMPONENTS thread)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -79,7 +78,6 @@ generate_messages(
   DEPENDENCIES
   nav_msgs
   sensor_msgs
-  std_msgs
 #  geomerty_msgs
 )
 
@@ -112,9 +110,10 @@ generate_messages(
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES csv_map_publisher
+catkin_package( 
+  CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS}
+  INCLUDE_DIRS include
+  LIBRARIES sphere_point2d point2d
 #  CATKIN_DEPENDS message_generation message_runtime nav_msgs roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -125,18 +124,22 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-  ${PROJECT_NAME}/include
-  ${catkin_INCLUDE_DIRS}
+include_directories( include
   ${Boost_INCLUDE_DIR}
+  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   include
-#   src/csv_reader.cpp
-#   src/
-# )
+add_library( ${PROJECT_NAME} 
+  # include/csv_reader.h
+  # include/csv_waypoints_map.h
+  # include/point2d.h
+  # include/sphere_point2d.h
+  src/csv_reader.cpp
+  src/csv_waypoints_map.cpp
+  src/point2d.cpp
+  src/sphere_point2d.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -159,7 +162,9 @@ add_executable(csv_map_publisher_node src/csv_map_publisher.cpp)
 add_dependencies(csv_map_publisher_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(csv_map_publisher_node
+target_link_libraries(
+  csv_map_publisher_node
+  ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
@@ -177,7 +182,7 @@ target_link_libraries(csv_map_publisher_node
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark executables and/or libraries for installation
+# ## Mark executables and/or libraries for installation
 # install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -185,11 +190,11 @@ target_link_libraries(csv_map_publisher_node
 # )
 
 ## Mark cpp header files for installation
-# install(DIRECTORY include
-#    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#    FILES_MATCHING PATTERN "*.h"
+install(DIRECTORY include
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+   FILES_MATCHING PATTERN "*.h"
 #    PATTERN ".svn" EXCLUDE
-# )
+)
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
