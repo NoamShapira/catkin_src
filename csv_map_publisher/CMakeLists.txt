@@ -215,3 +215,10 @@ install(FILES
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(test test/test.cpp)
+target_link_libraries(
+  test
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)

@@ -46,12 +46,14 @@ int main(int argc, char const *argv[])
         CsvWaypointsMap waypoints_map(good_path);
         boost::shared_ptr<SpherePoint2D> p1_ptr(new SpherePoint2D(32.1961762516997,34.8128624281800));
         p1_ptr->print();
+        cout << "expected: (32.1961762516997,34.81286242818)" << endl;
         boost::shared_ptr<SpherePoint2D> p2_ptr(new SpherePoint2D());
         p2_ptr->print();
-        vector<SpherePoint2D> rel_points;
+        cout << "expected: (0,0)" << endl;        vector<SpherePoint2D> rel_points;
         double radius_of_interse = 10;
         rel_points = waypoints_map.get_points_in_radius(p1_ptr, radius_of_interse);
-        cout << "number of relevant points is: " << rel_points.size() << endl;
+        cout << "number of relevant points in radius " <<
+             radius_of_interse << "(m) is: " << rel_points.size() << endl;
         if (rel_points.size() < 10) {
             
             for(vector<SpherePoint2D>::iterator it = rel_points.begin();
