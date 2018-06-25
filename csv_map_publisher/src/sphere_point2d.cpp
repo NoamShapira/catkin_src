@@ -29,6 +29,7 @@ double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
         throw (runtime_error(err_msg.str()));
     }
 
+    //A convention names for angles in radians
     double lam1, lam2, phi1, phi2;
     if(in_deg_)
     {
@@ -57,7 +58,8 @@ double SpherePoint2D::distance_to(boost::shared_ptr<Point2D> point_ptr)
 }
 
 double SpherePoint2D::haversine_distance_to(boost::shared_ptr<SpherePoint2D>  point_ptr)
-{      
+{   
+    //A convention names for angles in radians
     double lam1, lam2, phi1, phi2;
     if(in_deg_)
     {
@@ -83,6 +85,7 @@ double SpherePoint2D::haversine_distance_to(boost::shared_ptr<SpherePoint2D>  po
     double d_lamda = lam2- lam1;
     double d_phi = phi2 - phi1;
 
+    //The haversine formula for distance calaulation a the surface of a sphere
     double a = sin(d_phi/2)*sin(d_phi/2) +
                 (cos(phi1)*cos(phi2) * sin(d_lamda/2)*sin(d_lamda/2));
     double c = 2 * atan2(sqrt(a), sqrt(1-a));

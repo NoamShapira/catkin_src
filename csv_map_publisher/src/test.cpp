@@ -25,13 +25,21 @@ int main(int argc, char const *argv[])
         CSVReader csv_reader(good_path);
         cout << "created a reader" << endl;
         vector<vector<string>> csv_data = csv_reader.getData();
+        
         cout << "loaded the data" << endl;
         cout << "first row is: (" << csv_data.front().front() << "," 
             << csv_data.front().back()<< ")" << endl;
+        cout << "expected: (latitude,longitude)" << endl;
+        
         cout << "last row is: (" << csv_data.back().front() << "," 
             << csv_data.back().back()<< ")" << endl; 
+        cout << "expected: (34.81286242818,32.1961762516997)" << endl;
+        
         cout << "number of rows on csv file is: " << csv_data.size() << endl;
+        cout << "expected: 146" << endl;
+
         cout << "number of cols in first csv row is: " << csv_data.front().size() << endl;
+        cout << "expected: 2" << endl;
 
        
         cout << "\n---testing get_points_in_radius---\n"<< endl;
@@ -41,7 +49,8 @@ int main(int argc, char const *argv[])
         boost::shared_ptr<SpherePoint2D> p2_ptr(new SpherePoint2D());
         p2_ptr->print();
         vector<SpherePoint2D> rel_points;
-        rel_points = waypoints_map.get_points_in_radius(p1_ptr, 10);
+        double radius_of_interse = 10;
+        rel_points = waypoints_map.get_points_in_radius(p1_ptr, radius_of_interse);
         cout << "number of relevant points is: " << rel_points.size() << endl;
         if (rel_points.size() < 10) {
             
