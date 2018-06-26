@@ -1,0 +1,2 @@
+float64 tan_steering_angle
+float64 road_center_offset
