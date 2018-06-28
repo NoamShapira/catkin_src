@@ -8,7 +8,7 @@ project(mask_processing)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  message_generation
+  # message_generation
   rospy
   sensor_msgs
   std_msgs
@@ -108,7 +108,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mask_processing
-#  CATKIN_DEPENDS message_generation rospy sensor_msgs tf2
+ CATKIN_DEPENDS message_generation std_msgs rospy sensor_msgs tf2
 #  DEPENDS system_lib
 )
 

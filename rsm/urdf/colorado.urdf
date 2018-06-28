@@ -47,7 +47,7 @@
   <joint name="base_to_velodyne" type="fixed">
     <parent link="base_link"/>
     <child link="velodyne_link"/>
-    <origin xyz="2.0 0 2.0"/>
+    <origin xyz="1.0 0 2.0"/>
   </joint>
 
   <joint name="velodyne_to_nav" type="fixed">
@@ -59,13 +59,25 @@
   <joint name="velodyne_to_cam1" type="fixed">
     <parent link="velodyne_link"/>
     <child link="cam1_link"/>
-    <origin  rpy="-1.5707 0 -1.5707" xyz="0.21 0.3 -0.2"/>
+    <origin  rpy="0 0 0" xyz="0.21 0.3 -0.2"/>
   </joint>
 
   <joint name="cam1_to_cam2" type="fixed">
     <parent link="cam1_link"/>
     <child link="cam2_link"/>
-    <origin xyz="0.6 0 0"/>
+    <origin xyz="0 -0.6 0"/>
   </joint>
+
+  <!-- <joint name="velodyne_to_cam1" type="fixed">
+    <parent link="velodyne_link"/>
+    <child link="cam1_link"/>
+    <origin  rpy="-1.5707 0 -1.5707" xyz="0.21 0.3 -0.2"/>
+  </joint> -->
+
+  <!-- <joint name="cam1_to_cam2" type="fixed">
+    <parent link="cam1_link"/>
+    <child link="cam2_link"/>
+    <origin xyz="0.6 0 0"/>
+  </joint> -->
 
 </robot>
