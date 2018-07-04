@@ -32,7 +32,7 @@ class SpherePoint2D : public Point2D
          * @param lat represents latitude
          * @param in_deg represents whether the the values are metured in degrees
          */
-        SpherePoint2D(double lon, double lat, bool in_deg);
+        SpherePoint2D(long double lon, long double lat, bool in_deg);
 
         /*
          * @brief A constructor that asumes the values are in degrees 
@@ -40,7 +40,7 @@ class SpherePoint2D : public Point2D
          * @param lon represents longtitude
          * @param lat represents latitude
          */
-        SpherePoint2D(double lon, double lat);
+        SpherePoint2D(long double lon, long double lat);
 
         /*
          * @brief A empty constructor like SpherePoint2D(0,0,true)
@@ -73,25 +73,25 @@ class SpherePoint2D : public Point2D
          * @brief A wraper for get_x() for convinience 
          * @return the longtitude (or x) value
          */
-        double get_lon() {return get_x();}
+        long double get_lon() {return get_x();}
 
         /*
          * @brief A wraper for get_y() for convinience 
          * @return the latitude (or y) value
          */
-        double get_lat() {return get_y();}
+        long double get_lat() {return get_y();}
 
         /*
          * @brief A wraper for set_x() for convinience 
          * @param lon  longtitude (or x) value
          */
-        void set_lon(double lon) {set_x(lon);}
+        void set_lon(long double lon) {set_x(lon);}
 
         /*
          * @brief A wraper for set_y() for convinience 
          * @return latitude (or y) value
          */
-        void set_lat(double lat) {set_y(lat);}
+        void set_lat(long double lat) {set_y(lat);}
     };
 
 

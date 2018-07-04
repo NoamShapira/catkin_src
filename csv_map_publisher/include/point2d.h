@@ -2,6 +2,7 @@
 #define POINT2D
 
 #include <boost/shared_ptr.hpp>
+#include <string>
 #include <iostream>
 
 using namespace std;
@@ -21,7 +22,7 @@ public:
      * @param x first cordinate value
      * @param y second cordinate value
      */
-    Point2D(double x, double y);
+    Point2D(long double x, long double y);
 
     /*
      * @brief empty constructor (x,y) = (0,0)
@@ -37,31 +38,37 @@ public:
      * @brief getter for the first cordinate
      * @return first cordinate value
      */
-    double get_x();
+    long double get_x();
 
     /*
      * @brief getter for the second cordinate
      * @return second cordinate value
      */
-    double get_y();
+    long double get_y();
 
     /*
      * @brief setter for first cordinate
      * @param x the valuu for first cordinate
      */
-    void set_x(double x);
+    void set_x(long double x);
     
     /*
      * @brief setter for second cordinate
      * @param x the valuu for second cordinate
      */
-    void set_y(double y);
+    void set_y(long double y);
 
     /*
      * @brief a simple method that prints the points values to the standart output
      *  this is a virtual but not pure virtual method
      */
     virtual void print();
+
+    /*
+     * @brief a simple method that returns the points values as a string "(x,y)"
+     * @return a string representarion of the point
+     */
+    virtual string to_string();
 
     /*
      * @brief this interface only pure vertual method,

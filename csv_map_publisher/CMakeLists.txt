@@ -216,9 +216,22 @@ install(FILES
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(test_csv_map test/test_csv_map.cpp)
-target_link_libraries(
-  test_csv_map
-  ${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+# if (CATKIN_ENABLE_TESTING)
+#   find_package(rostest REQUIRED)
+
+#   add_rostest_gtest(csv_map_publisher-test test/csv_map_publisher.test test/test_csv_map_publisher.cpp)  
+#   target_link_libraries(csv_map_publisher-test ${PROJECT_NAME})
+
+# endif(CATKIN_ENABLE_TESTING)
+
+find_package(rostest REQUIRED)
+
+add_rostest_gtest(csv_map_publisher-test test/csv_map_publisher.test test/test_csv_map_publisher.cpp)  
+target_link_libraries(csv_map_publisher-test ${PROJECT_NAME})
+
+# add_executable(test_csv_map_publisher test/test_csv_map_publisher.cpp)
+# target_link_libraries(
+#   test_csv_map_publisher
+#   ${PROJECT_NAME}
+#   ${catkin_LIBRARIES}
+# )

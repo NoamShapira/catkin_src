@@ -6,8 +6,8 @@ import sensor_msgs.msg
 import tf
 from tf.transformations import euler_from_quaternion
 from tf2_msgs.msg import TFMessage
-from std_msgs.msg import Bool
-from mask_processing.msg import BoolMatrix
+# from std_msgs.msg import Bool
+from mask_processing.msg import IntMatrix
 from mask_processing.msg import RoadCenterCorection
 from camera_front_to_orto_shape_analysis import orto_shape_analysis
 # import mask_processing.msg
@@ -15,7 +15,6 @@ from camera_front_to_orto_shape_analysis import orto_shape_analysis
 import numpy as np
 
 # from mask_processing.msg import *
-
 
 # TODO cange to ROS params
 tf_topic_name = '/tf'
@@ -103,7 +102,8 @@ class MaskProcessingNode:
         angle from the heading of the vehicle to the road direction
         delta_r distance from the base of the vehicle to the mid road
 
-    delta_r is pissitive for 
+    delta_r is positive when road center is to the right of car center
+    heading_to_road_angle_rad is positive when the road is turning right in vehicle view
     """
     def get_road_angle_and_offset_in_car_system_from_center_line(self, slope, dr):
         new_slope = slope #camera and base axis systems are colinears
@@ -115,7 +115,7 @@ class MaskProcessingNode:
 
 
     def run(self):
-        mask_sub = rospy.Subscriber(mask_topic_name, BoolMatrix, self.sashas_mask_processing_method)
+        mask_sub = rospy.Subscriber(mask_topic_name, IntMatrix, self.sashas_mask_processing_method)
         rospy.spin()
         pass
 

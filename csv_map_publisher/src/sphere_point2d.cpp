@@ -1,10 +1,10 @@
 #include "../include/sphere_point2d.h"
 
-SpherePoint2D::SpherePoint2D(double lon, double lat)
+SpherePoint2D::SpherePoint2D(long double lon, long double lat)
     : Point2D(lon,lat), in_deg_(true)
 {}
 
-SpherePoint2D::SpherePoint2D(double lon, double lat, bool in_deg) 
+SpherePoint2D::SpherePoint2D(long double lon, long double lat, bool in_deg) 
     : Point2D(lon,lat), in_deg_(in_deg)
 {}
 

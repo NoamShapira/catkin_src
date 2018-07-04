@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="csv_map_publisher_test" pkg="csv_map_publisher" type="csv_map_publisher-test" />
+</launch>

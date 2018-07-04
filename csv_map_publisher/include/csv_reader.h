@@ -25,7 +25,7 @@ public:
 	/*
      * @brief a simple constructor 
      * @param filename the csv path
-	 * @param delm the string that seperats the values in the csv
+	 * @param delm the string that seperats the values in the csv default ','
      */
 	CSVReader(std::string filename, std::string delm = ",") :
 			fileName(filename), delimeter(delm)
