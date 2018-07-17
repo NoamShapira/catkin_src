@@ -71,6 +71,8 @@ TEST(CsvWaypointsMapTest, get_points_in_raidiusTest)
     ASSERT_EQ(rel_points.size(), 1); //only the point itself should be 0 distance from itself
 }
 
+// TODO need to add test for the ros service
+
 
 int main(int argc, char** argv) {
     testing::InitGoogleTest(&argc, argv);

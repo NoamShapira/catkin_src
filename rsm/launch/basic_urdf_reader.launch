@@ -7,6 +7,9 @@
     <!--remap from="robot_description" to="$(find rsm)/urdf/colorado.urdf" /-->
     <!--remap from="joint_states" to="different_joint_states" /-->
 </node>
+
+<!-- <node pkg="localization" type="tf_syntax.py" name="listener" /> -->
+
 <node pkg="rviz" type="rviz" name="my_rviz" 
     args="-d /home/rlb10/.rviz/colordo.rviz"/>
 </launch>
