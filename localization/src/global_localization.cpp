@@ -19,6 +19,7 @@ GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
     nh.getParam("rc_correction_topic_name", rc_correction_topic_name); // "road_center_correction"
     nh.getParam("g2l_queue_size", node_queue_size); // 1000
     nh.getParam("radius_of_interest", radius_of_interest); // 20
+    nh.getParam("path_fitting_deg", path_fitting_deg); // 5
     nh.getParam("cam_link", cam_link); //cam1_link 
 
     // node initialyzation
@@ -94,12 +95,31 @@ vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service()
     return rel_points;
 }
 
-vector<double> GlobalLocalizingNode::get_accurate_location_on_map_with_corections(
-        vector<double> corections_in_base_frame)
+sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_fit(
+        vector<sensor_msgs::NavSatFix> path, int deg)
 {
+    vector<double> rel_lons, rel_lats;
+    
+    for(vector<sensor_msgs::NavSatFix>::iterator it = path.begin();
+             it != path.end(); ++it)
+    {
+        rel_lons.push_back(it->longitude);
+        rel_lats.push_back(it->latitude);
+    }
+    // fit x,y a polyfit of degree deg
+    // TODO
+
+    // find on fit the closest point
+    // TODO
+}
+
+sensor_msgs::NavSatFix GlobalLocalizingNode::get_accurate_location_on_map_with_corections(
+        vector<double> corections_in_base_frame)
+{   
     // get nearby relevant points with service
-    vector<sensor_msgs::NavSatFix> rel_points = use_map_service();
-    // 
+    vector<sensor_msgs::NavSatFix> path_points = use_map_service();
+    // get astimated location on map - the closest point to road to gps
+    return get_closset_point_on_fit(path_points, path_fitting_deg);
     // TODO
 }
 
@@ -110,12 +130,12 @@ void GlobalLocalizingNode::rc_correction_callback(const mask_processing::RoadCen
             msg.heading_road_angle, msg.road_center_offset);
     
     // calculate lon, lat acording to corections
-    vector<double> location_from_IP = get_accurate_location_on_map_with_corections(
+    sensor_msgs::NavSatFix location_from_IP = get_accurate_location_on_map_with_corections(
         corections_in_base_frame);
     
     // update d_lon and d_lat
-    double IP_lon = location_from_IP.front();
-    double IP_lat = location_from_IP.back();
+    double IP_lon = location_from_IP.longitude;
+    double IP_lat = location_from_IP.latitude;
     double cur_gps_lon = cur_gps.longitude;
     double cur_gps_lat = cur_gps.latitude;
 

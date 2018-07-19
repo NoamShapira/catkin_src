@@ -35,6 +35,8 @@ private:
     ServiceClient get_waypoints_client;
 
     double radius_of_interest;
+    int path_fitting_deg;
+    
     /*
      * gps_location - location_error = IP_location
      */
@@ -63,7 +65,7 @@ private:
     *   first is longtitude in map according to image proccecing 
     *   second is latitude in map according to image proccecing 
     */
-    vector<double> get_accurate_location_on_map_with_corections(
+    sensor_msgs::NavSatFix get_accurate_location_on_map_with_corections(
         vector<double> corections_in_base_frame);
 
     /*
@@ -71,6 +73,13 @@ private:
     * @return vector<sensor_msgs::NavSatFix> all the relevant points from map in vector
     */
     vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service();
+
+    /*
+    * @brief 
+    * @return 
+    */
+    sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_fit(
+        vector<sensor_msgs::NavSatFix> path, int deg);
 
 public:
     GlobalLocalizingNode(int argc, char ** argv);
