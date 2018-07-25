@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(localization)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -112,6 +112,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+ CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS}
  INCLUDE_DIRS include
  LIBRARIES localization
 # CATKIN_DEPENDS mask_processing message_generation message_runtime nav_msgs roscpp sensor_msgs geometry_msgs std_msgs tf
@@ -145,8 +146,9 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(tf_listener_node src/tf_listener.cpp)
-add_executable(polyfit src/polyfit.cc)
+add_executable(global_localization_node src/global_localization.cpp)
+# add_executable(tf_listener_node src/tf_listener.cpp)
+# add_executable(polyfit src/polyfit.cc)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -159,12 +161,15 @@ add_executable(polyfit src/polyfit.cc)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tf_listener_node 
+target_link_libraries(global_localization_node
   ${catkin_LIBRARIES}
 )
-target_link_libraries(polyfit 
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(tf_listener_node 
+#   ${catkin_LIBRARIES}
+# )
+# target_link_libraries(polyfit 
+#   ${catkin_LIBRARIES}
+# )
 #############
 ## Install ##
 #############
@@ -194,11 +199,11 @@ install(PROGRAMS
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # launnch/tf_listener.launch
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+  launnch/g2l.launch
+  # myfile2
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##

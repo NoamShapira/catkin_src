@@ -77,7 +77,7 @@ private:
     * @brief a private method that uses the map service
     * @return vector<sensor_msgs::NavSatFix> all the relevant points from map in vector
     */
-    vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service();
+    vector<sensor_msgs::NavSatFix> use_map_service();
 
     /*
     * @brief a function that estimats a polynomial path from given waypoints and 
@@ -86,11 +86,11 @@ private:
     * @param deg the degree of the fitted polynomial
     * @return the closest point to the current location on the estimated polynome path
     */
-    sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_path(
+    sensor_msgs::NavSatFix get_closset_point_on_path(
         vector<sensor_msgs::NavSatFix> path, int deg);
 
 public:
-    GlobalLocalizingNode(int argc, char ** argv);
+    GlobalLocalizingNode();
     ~GlobalLocalizingNode();
 
     /*
@@ -112,7 +112,7 @@ public:
     *   the astimation og lon_error and lat_error according to road center correction
     * @param msg is the RoadCenterCorection recived from image processing
     */
-    void rc_correction_callback(const mask_processing::RoadCenterCorection& msg);
+    void rc_correction_callback(mask_processing::RoadCenterCorection msg);
 
     /*
     * @brief the function that publish the position astimated on map 

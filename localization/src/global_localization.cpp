@@ -2,15 +2,15 @@
 //local includes
 #include "../include/localization/global_localization.h"
 
-GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
+GlobalLocalizingNode::GlobalLocalizingNode()
 {
     // use param server
-    string node_name, publisher_topic_name, imu_sub_topic_name,
+    string publisher_topic_name, imu_sub_topic_name,
             gps_sub_topic_name, rc_correction_topic_name, cam_link;
     int node_queue_size;
     double path_res;
-    // TODO add parmaeters to launch
-    nh.getParam("global_localization_node_name", node_name); // "global_localization"
+    
+    // TODO change to dnmic reconfig
     nh.getParam("publisher_topic_name", publisher_topic_name); // "global_location"
     nh.getParam("imu_sub_topic_name", imu_sub_topic_name); // "arsys/imu"
     nh.getParam("gps_sub_topic_name", gps_sub_topic_name); // "arsys/gps"
@@ -22,14 +22,15 @@ GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
     nh.getParam("path_resolution", path_res); // 0.5
 
     // node initialyzation
-    init(argc, argv, node_name);
+    
     g2l_pub = nh.advertise<localization::GlobalLocation>(publisher_topic_name, node_queue_size);
     imu_sub = nh.subscribe<sensor_msgs::Imu>
-            (imu_sub_topic_name, node_queue_size, imu_callback);
+            (imu_sub_topic_name, node_queue_size, &GlobalLocalizingNode::imu_callback, this);
     gps_sub = nh.subscribe<sensor_msgs::NavSatFix>
-            (gps_sub_topic_name, node_queue_size, gps_callback);
+            (gps_sub_topic_name, node_queue_size, &GlobalLocalizingNode::gps_callback, this);
     rc_correction_sub = nh.subscribe<mask_processing::RoadCenterCorection>
-            (rc_correction_topic_name, node_queue_size, rc_correction_callback);
+            (rc_correction_topic_name, node_queue_size,
+             &GlobalLocalizingNode::rc_correction_callback, this);
     get_waypoints_client = nh.serviceClient<csv_map_publisher::GetWaypointsInRadius>
                 ("get_waypoints_in_radius");
     
@@ -85,7 +86,10 @@ vector<double> GlobalLocalizingNode::transform_corections_to_base_frame(
     // distance of road equation from origin
     road_center_offset_base_link = sin(heading_road_angle_base_link) * road_meet_y_axis;
    
-    return vector<double>(heading_road_angle_base_link, road_center_offset_base_link);
+    vector<double> ret{heading_road_angle_base_link,road_center_offset_base_link};
+    // ret.push_back(heading_road_angle_base_link);
+    // ret.push_back(road_center_offset_base_link);
+    return ret;
 }
 
 vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service()
@@ -165,7 +169,7 @@ sensor_msgs::NavSatFix GlobalLocalizingNode::get_accurate_location_on_map_with_c
     return get_closset_point_on_path(path_points, path_fitting_deg);
 }
 
-void GlobalLocalizingNode::rc_correction_callback(const mask_processing::RoadCenterCorection& msg)
+void GlobalLocalizingNode::rc_correction_callback(mask_processing::RoadCenterCorection msg)
 {
     // recive the corrections and transform them to base_link frame
     vector<double> corections_in_base_frame = transform_corections_to_base_frame(
@@ -207,9 +211,11 @@ void GlobalLocalizingNode::publish_global_location()
 
 int main(int argc, char  *argv[])
 {
-    GlobalLocalizingNode g_l_node(argc, argv);
+    ros::init(argc, argv, "global_localization");
+    GlobalLocalizingNode g_l_node();
     ros::AsyncSpinner spinner(3); 
     spinner.start();
+    // ros::spin();
     
     return 0;
 }
