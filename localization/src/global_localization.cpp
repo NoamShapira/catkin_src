@@ -1,7 +1,4 @@
 
-// ros includes
-#include <sensor_msgs/NavSatFix.h>
-
 //local includes
 #include "../include/localization/global_localization.h"
 
@@ -11,6 +8,7 @@ GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
     string node_name, publisher_topic_name, imu_sub_topic_name,
             gps_sub_topic_name, rc_correction_topic_name, cam_link;
     int node_queue_size;
+    double path_res;
     // TODO add parmaeters to launch
     nh.getParam("global_localization_node_name", node_name); // "global_localization"
     nh.getParam("publisher_topic_name", publisher_topic_name); // "global_location"
@@ -18,16 +16,20 @@ GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
     nh.getParam("gps_sub_topic_name", gps_sub_topic_name); // "arsys/gps"
     nh.getParam("rc_correction_topic_name", rc_correction_topic_name); // "road_center_correction"
     nh.getParam("g2l_queue_size", node_queue_size); // 1000
-    nh.getParam("radius_of_interest", radius_of_interest); // 20
-    nh.getParam("path_fitting_deg", path_fitting_deg); // 5
+    nh.getParam("radius_of_interest", radius_of_interest); // 50
+    nh.getParam("path_fitting_deg", path_fitting_deg); // 4
     nh.getParam("cam_link", cam_link); //cam1_link 
+    nh.getParam("path_resolution", path_res); // 0.5
 
     // node initialyzation
     init(argc, argv, node_name);
     g2l_pub = nh.advertise<localization::GlobalLocation>(publisher_topic_name, node_queue_size);
-    imu_sub = nh.subscribe(imu_sub_topic_name, node_queue_size, imu_callback);
-    gps_sub = nh.subscribe(gps_sub_topic_name, node_queue_size, gps_callback);
-    rc_correction_sub = nh.subscribe(rc_correction_topic_name, node_queue_size, rc_correction_callback);
+    imu_sub = nh.subscribe<sensor_msgs::Imu>
+            (imu_sub_topic_name, node_queue_size, imu_callback);
+    gps_sub = nh.subscribe<sensor_msgs::NavSatFix>
+            (gps_sub_topic_name, node_queue_size, gps_callback);
+    rc_correction_sub = nh.subscribe<mask_processing::RoadCenterCorection>
+            (rc_correction_topic_name, node_queue_size, rc_correction_callback);
     get_waypoints_client = nh.serviceClient<csv_map_publisher::GetWaypointsInRadius>
                 ("get_waypoints_in_radius");
     
@@ -39,12 +41,13 @@ GlobalLocalizingNode::GlobalLocalizingNode(int argc, char ** argv)
     tf::TransformListener listener;
     tf::StampedTransform transform;
     // TODO add check fransform not found
-    listener.lookupTransform(cam_link, "base_link", ros::Time(0), transform);
-    base_to_cam_transform = transform;
+    listener.waitForTransform("base_link", cam_link, ros::Time(0), ros::Duration(3.0));
+    listener.lookupTransform("base_link", cam_link, ros::Time(0), transform);
+    cam_to_base_transform = transform;
 
     // initialize correction
-    lon_error = 0; // radians needed to sabtruct from matured longtitude
-    lat_error = 0; // radians needed to sabtruct from matured latitude
+    lon_error = 0; // degrees needed to sabtruct from matured longtitude
+    lat_error = 0; // degrees needed to sabtruct from matured latitude
 }
 
 GlobalLocalizingNode::~GlobalLocalizingNode(){}
@@ -57,32 +60,44 @@ void GlobalLocalizingNode::imu_callback(const sensor_msgs::Imu::ConstPtr& msg)
 void GlobalLocalizingNode::gps_callback(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
     cur_gps = *msg;
+    publish_global_location();
 }
 
 vector<double> GlobalLocalizingNode::transform_corections_to_base_frame(
             double heading_road_angle, double road_center_offset)
 {
-    double dx, dy, heading_road_angle_base_link, road_center_offset_base_link;
-    dx = base_to_cam_transform.getOrigin().x();
-    dy = base_to_cam_transform.getOrigin().y();
+    double heading_road_angle_base_link, road_center_offset_base_link;
 
     // -1 because of the cordinate movment
     heading_road_angle_base_link = (-1) * heading_road_angle;
-    
-    
-    //TODO add
+    // find a point on the road center in cam_link
+    tf::Vector3 closest_point_in_cam_link(
+        (-1)*road_center_offset*sin(heading_road_angle),
+        (-1)*road_center_offset*cos(heading_road_angle), 
+        cam_to_base_transform.getOrigin().getZ()); 
+    // transform the point to base_link
+    tf::Vector3 closest_point_in_base_link = cam_to_base_transform * closest_point_in_cam_link;
+    // base link road equetion y-y1 = (x-x1)*tan(theta)
+    // clculate road_center_offset_base_link in base link
+    double x1 = closest_point_in_base_link.getX();
+    double y1 = closest_point_in_base_link.getY();
+    double road_meet_y_axis = y1 - x1*tan(heading_road_angle_base_link);
+    // distance of road equation from origin
+    road_center_offset_base_link = sin(heading_road_angle_base_link) * road_meet_y_axis;
+   
+    return vector<double>(heading_road_angle_base_link, road_center_offset_base_link);
 }
 
 vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service()
 {
-    vector<sensor_msgs::NavSatFix> rel_points;
     csv_map_publisher::GetWaypointsInRadius srv;
     srv.request.location = cur_gps;
     srv.request.radius = radius_of_interest;
+    vector<sensor_msgs::NavSatFix> rel_points;
     if (get_waypoints_client.call(srv))
     {
-        // TODO assign the array into a cpp vector
-        // rel_points.assign(srv.response.relevant_waypoints;
+        rel_points.assign(
+            srv.response.relevant_waypoints.begin(), srv.response.relevant_waypoints.end());
         if(rel_points.size() < 2)
         {
             ROS_ERROR("found less then 2 points try increasing the 'radius_of_interest'");
@@ -95,22 +110,50 @@ vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service()
     return rel_points;
 }
 
-sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_fit(
+sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_path(
         vector<sensor_msgs::NavSatFix> path, int deg)
 {
-    vector<double> rel_lons, rel_lats;
-    
+    // i fit a polynome to the path relative to the curent location and in meters for convenience
+    vector<double> relative_lons_meters, relative_lats_meters;
     for(vector<sensor_msgs::NavSatFix>::iterator it = path.begin();
              it != path.end(); ++it)
     {
-        rel_lons.push_back(it->longitude);
-        rel_lats.push_back(it->latitude);
+        relative_lons_meters.push_back((it->longitude - cur_gps.longitude)*R_EARTH_ISRAEL);
+        relative_lats_meters.push_back((it->latitude - cur_gps.latitude)*R_EARTH_ISRAEL);
     }
+    vector<double> coeff;
     // fit x,y a polyfit of degree deg
-    // TODO
-
+    polyfit(relative_lons_meters, relative_lats_meters, coeff, deg);
+    
     // find on fit the closest point
-    // TODO
+    // sample the fit
+    vector<Point2d> sampled_points;
+    Point2d cur_point, clossest_point;
+    for(double x = -radius_of_interest/2 ; x < radius_of_interest/2; x += path_res)
+    {
+        double y = 0;
+        for(int i = 0; coeff.size(); i++)
+        {
+            y+= coeff[i] * pow(x, (double)i);
+        }
+        cur_point = Point2d(x,y);
+        sampled_points.push_back(cur_point);
+    }
+    
+    // find the clossest point to the sampled points
+    clossest_point = Point2d::clossest2origin(sampled_points);
+
+    // create a NavSatfix
+    sensor_msgs::NavSatFix map_location;
+    map_location.header = cur_gps.header;
+    map_location.altitude = cur_gps.altitude;
+    map_location.position_covariance = cur_gps.position_covariance;
+    map_location.position_covariance_type = cur_gps.position_covariance_type;
+    map_location.status = cur_gps.status;
+    map_location.longitude = (clossest_point.get_x()/R_EARTH_ISRAEL)+cur_gps.longitude;
+    map_location.latitude = (clossest_point.get_y()/R_EARTH_ISRAEL)+cur_gps.latitude;
+    
+    return map_location;
 }
 
 sensor_msgs::NavSatFix GlobalLocalizingNode::get_accurate_location_on_map_with_corections(
@@ -119,8 +162,7 @@ sensor_msgs::NavSatFix GlobalLocalizingNode::get_accurate_location_on_map_with_c
     // get nearby relevant points with service
     vector<sensor_msgs::NavSatFix> path_points = use_map_service();
     // get astimated location on map - the closest point to road to gps
-    return get_closset_point_on_fit(path_points, path_fitting_deg);
-    // TODO
+    return get_closset_point_on_path(path_points, path_fitting_deg);
 }
 
 void GlobalLocalizingNode::rc_correction_callback(const mask_processing::RoadCenterCorection& msg)
@@ -141,6 +183,8 @@ void GlobalLocalizingNode::rc_correction_callback(const mask_processing::RoadCen
 
     lon_error = cur_gps_lon - IP_lon;
     lat_error = cur_gps_lat - IP_lat;
+
+    // TODO maybe add memory to lon_error calculation
 
 }
 
@@ -164,9 +208,9 @@ void GlobalLocalizingNode::publish_global_location()
 int main(int argc, char  *argv[])
 {
     GlobalLocalizingNode g_l_node(argc, argv);
-    //TODO use unsynchronyzed spin for subscribers and while(rate) for publisher
+    ros::AsyncSpinner spinner(3); 
+    spinner.start();
     
-    g_l_node.publish_global_location();
     return 0;
 }
 

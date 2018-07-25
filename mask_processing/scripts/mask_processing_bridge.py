@@ -99,8 +99,8 @@ class MaskProcessingNode:
     """
     This is the math of tranforming the line given from 
     sasha in sasha's cam coordinats, to a non coordinate parameres
-        angle from the heading of the vehicle to the road direction
-        delta_r distance from the base of the vehicle to the mid road
+        angle from the heading of the vehicle to the road direction in rads
+        delta_r distance from the base of the vehicle to the mid road in meters
 
     delta_r is positive when road center is to the right of car center
     heading_to_road_angle_rad is positive when the road is turning right in vehicle view

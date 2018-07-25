@@ -124,6 +124,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
@@ -143,6 +146,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(tf_listener_node src/tf_listener.cpp)
+add_executable(polyfit src/polyfit.cc)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,10 +159,12 @@ add_executable(tf_listener_node src/tf_listener.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(tf_listener_node
+target_link_libraries(tf_listener_node 
   ${catkin_LIBRARIES}
 )
-
+target_link_libraries(polyfit 
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

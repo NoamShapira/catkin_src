@@ -1,0 +1,3 @@
+<launch>
+  <test test-name="localization_test" pkg="localization" type="localization-test" />
+</launch>

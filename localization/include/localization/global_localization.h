@@ -4,6 +4,7 @@
 // c++ libraries
 #include <string>
 #include <vector>
+#include <math.h>
 
 // ros standarts libreries
 #include <ros/ros.h>
@@ -18,6 +19,7 @@
 #include "mask_processing/RoadCenterCorection.h"
 #include "localization/GlobalLocation.h"
 #include "csv_map_publisher/GetWaypointsInRadius.h"
+#include "../libs/local_math_lib.h"
 
 
 using namespace ros;
@@ -28,7 +30,7 @@ class GlobalLocalizingNode
 private:
     sensor_msgs::NavSatFix cur_gps;
     geometry_msgs::Quaternion cur_heading_quaternions;
-    tf::StampedTransform base_to_cam_transform;
+    tf::StampedTransform cam_to_base_transform;
     NodeHandle nh;
     Publisher g2l_pub;
     Subscriber imu_sub, gps_sub, rc_correction_sub;
@@ -36,6 +38,7 @@ private:
 
     double radius_of_interest;
     int path_fitting_deg;
+    double path_res;
     
     /*
      * gps_location - location_error = IP_location
@@ -49,8 +52,10 @@ private:
     * @param road_center_offset the distance from the road center line in camera_frame
     *   as recived from IP, possitive is right of forward direction
     * @return vector<double> 2 parameters vector, 
-    *   first is heading angle from road center in base link frame
+    *   first is heading angle from road center in base link frame 
+    *       zero with x axis and rising counter clockwise
     *   second is offset from road center in base link frame
+    *       possitive when road is to the left of vehile - with y axis
     */
     vector<double> transform_corections_to_base_frame(
             double heading_road_angle, double road_center_offset);
@@ -75,10 +80,13 @@ private:
     vector<sensor_msgs::NavSatFix> GlobalLocalizingNode::use_map_service();
 
     /*
-    * @brief 
-    * @return 
+    * @brief a function that estimats a polynomial path from given waypoints and 
+    *   returns the  clossest point to the current location on htat polynome
+    * @param path a vector of the close waypoints
+    * @param deg the degree of the fitted polynomial
+    * @return the closest point to the current location on the estimated polynome path
     */
-    sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_fit(
+    sensor_msgs::NavSatFix GlobalLocalizingNode::get_closset_point_on_path(
         vector<sensor_msgs::NavSatFix> path, int deg);
 
 public:
